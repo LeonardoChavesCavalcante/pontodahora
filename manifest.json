@@ -1,0 +1,44 @@
+{
+    // Obrigatório
+    "manifest_version": 2,
+    "name": "PontoDaHora",
+    "version": "1.0",
+ 
+    // Descrição da nossa extensão
+    "description": "A ferramenta facilita a visualização do seu saldo no banco de horas, e a previsão de saída do dia.",
+ 
+    // Íconea da nossa extensão
+    "icons": {
+       "48": "icon48.png",
+       "128": "icon128.png"
+    },
+ 
+    // Utilizaremos as "Page Actions" e registramos isso aqui
+    "page_action": {
+        "default_icon": {
+            "19" : "icon19.png"
+        },
+        "default_title": "Ponto ELotech"
+    },
+ 
+    // Aqui declaramos as permissões que precisamos
+    "permissions": [
+        "tabs",
+        "http://*/*",
+        "https://*/*",
+        "declarativeContent"
+    ],
+ 
+    // Utilizaremos uma "Event Page" (note o persistent: false)
+    "background": {
+        "scripts": ["main.js"],
+        "persistent": false
+    },
+ 
+    // Injetaremos esses arquivos quando "match" ocorrer
+    "content_scripts": [ {
+        "js": ["main.js" ],        
+        "css": ["main.css" ],
+        "matches": [ "https://*.secullum.com.br/Ponto4Web/*" ]
+    } ]
+}
