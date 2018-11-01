@@ -84,3 +84,14 @@ HEADER
    
 GET   https://www.secullum.com.br/Ponto4Web/api/1185328083/Periodos?funcionarioId=60
 RESPONSE   {"lista":[{"id":4,"nome":"Novembro/2018"},{"id":3,"nome":"Outubro/2018"},{"id":1,"nome":"Setembro/2018"}],"periodoAtual":4}
+
+dados.colunas.filter( x => x.conteudo =='BSaldo')[0].id
+
+dados.linhas.filter( x => x[0].conteudo ==  '01/11/2018 - QUI')[0][dados.colunas.indexOf(dados.colunas.filter( x => x.conteudo =='BSaldo')[0])]
+
+dados.linhas.filter( x => x[0].conteudo ==  '01/11/2018 - QUI')[0][dados.colunas.indexOf(dados.colunas.filter( x => x.conteudo =='Ent. 2')[0])].conteudo;
+
+https://www.treinaweb.com.br/blog/requisicoes-ajax-no-javascript-com-a-fetch-api/
+
+var d = new Date();
+var n = d.getDay();
