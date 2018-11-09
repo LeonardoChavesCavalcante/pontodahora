@@ -2,10 +2,8 @@
     background-color:lightgreen;
     float:left;
     padding:8px;
-    padding-left: 25px;
-    margin-top: 150px;
-    margin-left: 10px;
-    padding-right: 100px;    
+    color: black;
+   
     font-style:bold;
     font-weight:bold;
     font-family: "Segoe UI","Arial","Times New Roman";
@@ -17,19 +15,38 @@
     box-shadow: 0 18px 16px 0 rgba(0,0,0,0.2);
 }
 
-input {
-    padding: 10px 10px 10px 40px;
-    height: 40px;
-    width: 100%;
+#login-form-campos input {
     background-repeat: no-repeat;
     background-position: 12px center;
     margin-top: 10px;
+    background-color: rgb(250, 255, 189) ;
+    color: rgb(0, 0, 0) ;
 }
-input, textarea, select, button, meter, progress {
-    -webkit-writing-mode: horizontal-tb !important;
+#login-form-campos button {
+    border-image: none;
+    background-color: #015b75;
+    background-repeat: repeat-x;
+    display: inline-block;
+   
+    cursor: pointer;
+    text-align: center;
+    margin: 0px 0;
+    height: 25px;
+    width: 100%;
+    color: #fff;
+    font-size: 13px;
+    line-height: 28px;
+    border: none;
+    -webkit-text-shadow: none;
+    -ms-text-shadow: none;
+    -moz-text-shadow: none;
+    -o-text-shadow: none;
+    text-shadow: none;
 }
-input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
-    background-color: rgb(250, 255, 189) !important;
-    background-image: none !important;
-    color: rgb(0, 0, 0) !important;
-}   
+button, html, input, select, textarea {
+    font-family: Lato-Regular,"Lucida Grande","Lucida Sans Unicode",Helvetica,sans-serif!important;
+}
+/*  padding-left: 25px;
+margin-top: 150px;
+margin-left: 10px;
+padding-right: 100px;     */

@@ -1,46 +1,81 @@
 
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('jstrigger').onclick=() => myFunction('aqui é operario!');
-    document.getElementById('pegaCookie').onclick=() => alert('aqui ' +getCookie('meucookie'));
-    //document.getElementById("click-this").addEventListener("click", handler);
-  });
-
-
-function myFunction(parametro){
-    setCookie('meucookie',parametro);
-}
-
 let saidaPrevista = "0:00";
 let saidaLimite = "0:00";
 let saldoGeral = "0:00";
-let htmlBox = "";
+
+
+const htmlLogin = `<div id="login-form-campos">
+                    <h3>Login do Ponto</h3>
+                   <p>
+                      <input name="usuario" type="text" placeholder="Nº da Folha" value="" maxlength="22">
+                   </p>
+                   <p>
+                      <input name="senha" type="password" placeholder="Senha" value="" maxlength="10">
+                   </p>
+                   <ul class="errorList"></ul>
+                   <p> 
+                    <button id="login">Entrar</button>
+                   </p>
+                 </div>`;
+
+const htmlSaldo = ` <div id='eloSaldo' class='eloPonto'> 
+                         Saída: ${saidaPrevista}
+                    <br> Limite:${saidaLimite} 
+                    <br> Saldo: ${saldoGeral} 
+                  </div>`;
+
+
 
 const seletorPopUp = "#pontoPopup";
-if (document.querySelector(seletorPopUp) != null){
-    document.querySelector(seletorPopUp).innerHTML = "<h1>coloquei aqui </h1>";
-}
+const seletorPagina = "#nav-container";
 
-let seletorPrincipal = "#nav-container";
-function setHeader() {
-    
-    
 
-    if (document.querySelector(seletorPrincipal) != null) {
+const seletor = seletorPopUp;
 
-        saldoGeral = "10"
-        htmlBox += " <div id='elo' class='eloPonto'> "; 
-
-        htmlBox += ` Saída: ${saidaPrevista}`;
-        htmlBox += `<br> Limite:${saidaLimite} `;
-        htmlBox += ` <br> Saldo: ${saldoGeral} `;
-        htmlBox += "</div>";
-
-        document.querySelector(seletorPrincipal).innerHTML += htmlBox;
+const myInterval = setInterval(() => {
+    if (document.querySelector(seletor)) {
+        clearInterval(myInterval);
+        main();
     }
-    autenticar('232', 'l30n4rd0!');
+}, 10);
+
+main = () => {
+    //setHeader();
+
 }
 
 
+function setHeader() {
+    let cookieAuth = getCookie('auth');
+    if ((cookieAuth && cookieAuth != '')) {
+        getDadosBancoHoras();
+    }
+    else {
+        if (document.getElementById('popupDados')) {
+            document.getElementById('popupDados').innerHTML = htmlLogin;
+        }
+    }
+
+
+    if (document.getElementById('popupDados')) {
+        if ((cookieAuth && cookieAuth != '')) {
+            document.getElementById('popupDados').innerHTML = htmlSaldo;
+        } else {
+            document.getElementById('popupDados').innerHTML = htmlLogin;
+        }
+    }
+    if (document.querySelector(seletorPagina)) {
+        document.querySelector(seletorPagina).innerHTML = htmlSaldo;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    setHeader();
+});
+
+getDadosBancoHoras = () => {
+
+}
 
 
 async function autenticar(usuario, senha) {
@@ -49,29 +84,31 @@ async function autenticar(usuario, senha) {
         "usuario": "232",
         "senha": "l30n4rd0!",
         "acesso": "0",
-            "continuarConectado": false,
+        "continuarConectado": false,
         "nomeEmpresa": "ELOTECH"
     };
-    const header = { "Content-Type": "application/json",
-                     "Authorization":""};
+    const header = {
+        "Content-Type": "application/json",
+        "Authorization": ""
+    };
 
     const dadosPost = {
         method: 'POST',
         headers: header,
         body: JSON.stringify(dadosAutenticacao)
     }
-    let token ="Basic  ";
+    let token = "Basic  ";
     console.log('teste1');
     await fetch('https://www.secullum.com.br/Ponto4Web/api/1185328083/Login', dadosPost);
-    token +=getCookie('auth');          
-    
+    token += getCookie('auth');
+
     header.Authorization = token;
     delete dadosPost.body;
     dadosPost.method = "GET";
-    let valor ="0";
+    let valor = "0";
     await fetch('https://www.secullum.com.br/Ponto4Web/api/1185328083/Sessao/GetIdFuncionarioSessao', dadosPost).then(resp => valor = resp.text());
 
-     console.log('valor',valor);
+    console.log('valor', valor);
 
 
 }
@@ -98,4 +135,4 @@ function getCookie(cname) {
     return "";
 };
 
-setTimeout(setHeader,2000);
+setTimeout(setHeader, 2000);
