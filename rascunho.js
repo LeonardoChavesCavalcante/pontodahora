@@ -73,3 +73,11 @@ https://www.treinaweb.com.br/blog/requisicoes-ajax-no-javascript-com-a-fetch-api
 
 var d = new Date();
 var n = d.getDay();
+
+   // Utilizaremos as "Page Actions" e registramos isso aqui
+   "page_action": {
+    "default_icon": {
+        "19" : "icon19.png"
+    },
+    "default_title": "Ponto ELotech"
+},

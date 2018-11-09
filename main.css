@@ -16,3 +16,20 @@
 .eloPonto:hover {
     box-shadow: 0 18px 16px 0 rgba(0,0,0,0.2);
 }
+
+input {
+    padding: 10px 10px 10px 40px;
+    height: 40px;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: 12px center;
+    margin-top: 10px;
+}
+input, textarea, select, button, meter, progress {
+    -webkit-writing-mode: horizontal-tb !important;
+}
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+    background-color: rgb(250, 255, 189) !important;
+    background-image: none !important;
+    color: rgb(0, 0, 0) !important;
+}   
