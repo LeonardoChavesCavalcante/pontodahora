@@ -1,3 +1,4 @@
+let idFuncionario;
 
 let saidaPrevista = "0:00";
 let saidaLimite = "0:00";
@@ -14,7 +15,7 @@ const htmlLogin = `<div id="login-form-campos">
                    </p>
                    <ul class="errorList"></ul>
                    <p> 
-                    <button id="login">Entrar</button>
+                    <button id="btnLogin">Entrar</button>
                    </p>
                  </div>`;
 
@@ -26,43 +27,31 @@ const htmlSaldo = ` <div id='eloSaldo' class='eloPonto'>
 
 
 
-const seletorPopUp = "#pontoPopup";
+const seletorPopUp = "#popupDados";
 const seletorPagina = "#nav-container";
 
 
 const seletor = seletorPopUp;
 
-const myInterval = setInterval(() => {
-    if (document.querySelector(seletor)) {
-        clearInterval(myInterval);
-        main();
-    }
-}, 10);
+function main() {
 
-main = () => {
-    //setHeader();
-
-}
-
-
-function setHeader() {
     let cookieAuth = getCookie('auth');
+
+
     if ((cookieAuth && cookieAuth != '')) {
         getDadosBancoHoras();
+
     }
     else {
-        if (document.getElementById('popupDados')) {
-            document.getElementById('popupDados').innerHTML = htmlLogin;
+        if (document.querySelector(seletorPopUp)) {
+            document.querySelector('#popupDados').innerHTML = htmlLogin;
         }
     }
 
+    if (document.querySelector(seletorPopUp)) {
 
-    if (document.getElementById('popupDados')) {
-        if ((cookieAuth && cookieAuth != '')) {
-            document.getElementById('popupDados').innerHTML = htmlSaldo;
-        } else {
-            document.getElementById('popupDados').innerHTML = htmlLogin;
-        }
+        document.querySelector(seletorPopUp).innerHTML = htmlSaldo;
+        document.querySelector(seletorPopUp).innerHTML = htmlLogin;
     }
     if (document.querySelector(seletorPagina)) {
         document.querySelector(seletorPagina).innerHTML = htmlSaldo;
@@ -71,46 +60,84 @@ function setHeader() {
 
 document.addEventListener('DOMContentLoaded', function () {
     setHeader();
+    document.querySelector("#btnLogin").onclick = ()=>{
+        autenticar( '','');
+    }
 });
 
-getDadosBancoHoras = () => {
+const getDadosBancoHoras = async () => {
+    fetch
 
+
+    https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=60&periodoId=3
 }
 
 
-async function autenticar(usuario, senha) {
+const autenticar = async (usuario, senha) => {
 
     const dadosAutenticacao = {
-        "usuario": "232",
-        "senha": "l30n4rd0!",
+        "usuario": usuario,
+        "senha": senha,
         "acesso": "0",
-        "continuarConectado": false,
-        "nomeEmpresa": "ELOTECH"
+        "continuarConectado": true,
+        "nomeEmpresa": ""
     };
-    const header = {
-        "Content-Type": "application/json",
-        "Authorization": ""
-    };
+
 
     const dadosPost = {
         method: 'POST',
-        headers: header,
+        headers: getHeader(),
         body: JSON.stringify(dadosAutenticacao)
     }
-    let token = "Basic  ";
-    console.log('teste1');
+
     await fetch('https://www.secullum.com.br/Ponto4Web/api/1185328083/Login', dadosPost);
-    token += getCookie('auth');
+}
 
-    header.Authorization = token;
-    delete dadosPost.body;
-    dadosPost.method = "GET";
-    let valor = "0";
-    await fetch('https://www.secullum.com.br/Ponto4Web/api/1185328083/Sessao/GetIdFuncionarioSessao', dadosPost).then(resp => valor = resp.text());
+const getIDFuncionario = async () => {
 
-    console.log('valor', valor);
+    let urlGetIDFuncionario = "'https://www.secullum.com.br/Ponto4Web/api/1185328083/Sessao/GetIdFuncionarioSessao";
+    let dadosReq = {
+        method: 'GET',
+        headers: getHeader()
+    }
+    
+    await fetch(urlGetIDFuncionario, dadosReq).then(resp => valor = resp.json)
+        .then(resp => idFuncionario = resp);
+    return idFuncionario;
+}
 
+const getPeriodoAtual = async () =>{
+    
+    let dadosReq = {
+        method: 'GET',
+        headers: getHeader()
+    }    
+    let periodAtual;
+    let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/Periodos?funcionarioId=${idFuncionario}`
+    return await fetch(urlPeriodo, dadosReq).then(resp => valor = resp.json)
+        .then(resp =>  res.periodAtual);
 
+}
+
+const getBancoHoras = async () =>{
+    let dadosReq = {
+        method: 'GET',
+        headers: getHeader()
+    }   
+    idFuncionario = getIDFuncionario();
+    let periodAtual = await getPeriodoAtual();
+    let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=3${idPeriodoAtual}`
+    return await fetch(urlPeriodo, dadosReq).then(resp => valor = resp.json)
+        .then(resp =>  res.periodAtual);
+
+}
+
+const getHeader = () => {
+
+    return {
+        "Content-Type": "application/json",
+        "Authorization": "Basic " + getCookie('auth')
+    };
 }
 
 function setCookie(cname, cvalue, exdays) {
@@ -133,6 +160,4 @@ function getCookie(cname) {
         }
     }
     return "";
-};
-
-setTimeout(setHeader, 2000);
+};  

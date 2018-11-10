@@ -44,6 +44,19 @@ function getCookie(cname) {
     return "";
 }
 
+const myInterval = setInterval(() => {
+    if (document.querySelector(seletor)) {
+        clearInterval(myInterval);
+        main();
+    }
+}, 10);
+
+main = () => {
+    //setHeader();
+
+}
+
+
 POST
 https://www.secullum.com.br/Ponto4Web/api/1185328083/Login
 {"usuario":"232","senha":"l30n4rd0!","acesso":"0","continuarConectado":false,"nomeEmpresa":"ELOTECH"}
