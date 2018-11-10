@@ -8,10 +8,10 @@ let saldoGeral = "0:00";
 const htmlLogin = `<div id="login-form-campos">
                     <h3>Login do Ponto</h3>
                    <p>
-                      <input name="usuario" type="text" placeholder="Nº da Folha" value="" maxlength="22">
+                      <input name="usuario" id="userLogin" type="text" placeholder="Nº da Folha" value="" maxlength="22">
                    </p>
                    <p>
-                      <input name="senha" type="password" placeholder="Senha" value="" maxlength="10">
+                      <input name="senha" id="userSenha" type="password" placeholder="Senha" value="" maxlength="10">
                    </p>
                    <ul class="errorList"></ul>
                    <p> 
@@ -33,8 +33,16 @@ const seletorPagina = "#nav-container";
 
 const seletor = seletorPopUp;
 
-function main() {
+const logar = ()=>{
+    let usuario = document.querySelector("#userLogin").value;
+    let senha = document.querySelector("#userSenha").value;
+    
+    autenticar(usuario,senha);
+    alert( getCookie('auth'));
+}
 
+function main() {
+    
     let cookieAuth = getCookie('auth');
 
 
@@ -44,7 +52,7 @@ function main() {
     }
     else {
         if (document.querySelector(seletorPopUp)) {
-            document.querySelector('#popupDados').innerHTML = htmlLogin;
+            document.querySelector(seletorPopUp).innerHTML = htmlLogin;
         }
     }
 
@@ -59,17 +67,24 @@ function main() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    setHeader();
-    document.querySelector("#btnLogin").onclick = ()=>{
-        autenticar( '','');
+    main();
+    if (document.querySelector("#btnLogin")){
+      document.querySelector("#btnLogin").onclick = logar;
     }
+
 });
 
 const getDadosBancoHoras = async () => {
-    fetch
+
+    let urlDadosPonto = `https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=${getPeriodoAtual()}"`
+    let dadosReq = {
+        method: 'GET',
+        headers: getHeader()
+    };
+    fetch(urlDadosPonto, dadosReq)
 
 
-    https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=60&periodoId=3
+
 }
 
 
@@ -83,14 +98,15 @@ const autenticar = async (usuario, senha) => {
         "nomeEmpresa": ""
     };
 
-
     const dadosPost = {
         method: 'POST',
         headers: getHeader(),
         body: JSON.stringify(dadosAutenticacao)
     }
 
-    await fetch('https://www.secullum.com.br/Ponto4Web/api/1185328083/Login', dadosPost);
+    await fetch('https://www.secullum.com.br/Ponto4Web/api/1185328083/Login', dadosPost)
+    .then( resp => resp.json());
+    
 }
 
 const getIDFuncionario = async () => {
@@ -100,35 +116,35 @@ const getIDFuncionario = async () => {
         method: 'GET',
         headers: getHeader()
     }
-    
+
     await fetch(urlGetIDFuncionario, dadosReq).then(resp => valor = resp.json)
         .then(resp => idFuncionario = resp);
     return idFuncionario;
 }
 
-const getPeriodoAtual = async () =>{
-    
+const getPeriodoAtual = async () => {
+
     let dadosReq = {
         method: 'GET',
         headers: getHeader()
-    }    
+    }
     let periodAtual;
     let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/Periodos?funcionarioId=${idFuncionario}`
     return await fetch(urlPeriodo, dadosReq).then(resp => valor = resp.json)
-        .then(resp =>  res.periodAtual);
+        .then(resp => res.periodAtual);
 
 }
 
-const getBancoHoras = async () =>{
+const getBancoHoras = async () => {
     let dadosReq = {
         method: 'GET',
         headers: getHeader()
-    }   
+    }
     idFuncionario = getIDFuncionario();
     let periodAtual = await getPeriodoAtual();
     let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=3${idPeriodoAtual}`
     return await fetch(urlPeriodo, dadosReq).then(resp => valor = resp.json)
-        .then(resp =>  res.periodAtual);
+        .then(resp => res.periodAtual);
 
 }
 
