@@ -4,7 +4,7 @@
     "name": "PontoDaHora",
     "version": "1.0",
     // Descrição da nossa extensão
-    "description": "A ferramenta facilita a visualização do seu saldo no banco de horas, e a previsão de saída do dia.",
+    "description": "A ferramenta facilita a visualização do seu saldo no banco de horas e a previsão de saída no dia. É necessário selecionar todas as colunas de entradas e saídas e a coluna BSaldo.",
  
     // Íconea da nossa extensão
     "icons": {
@@ -24,14 +24,7 @@
         "http://*/*",
         "https://*/*",
         "declarativeContent"
-    ],
- 
-    // Utilizaremos uma "Event Page" (note o persistent: false)
-    "background": {
-        "scripts": ["main.js"],
-        "persistent": false
-    },
- 
+    ], 
     // Injetaremos esses arquivos quando "match" ocorrer
     "content_scripts": [ {
         "js": ["main.js" ],        
