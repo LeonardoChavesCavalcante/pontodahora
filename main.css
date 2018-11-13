@@ -10,8 +10,8 @@
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;     
     width: 130px;   
-    height: 75px;
-    padding-top:10px;
+    height: 80px;
+    padding-top:5px;
     padding-left:10px;
 }
 .eloPonto:hover {

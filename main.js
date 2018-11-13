@@ -1,17 +1,21 @@
-
-let cargaHorariaMinutos = 528; 
+let dadosReq = {};
+let cargaHorariaMinutos = 528;
 let minutosLimiteAcimadaCarga = 72;
 let saidaPrevista = " 0:00";
 let saidaLimite = " 0:00";
 let saldoGeral = " 0:00";
 let seletorPagina = "#dados-cartao-ponto"; // "#nav-container"
 
+const timer = setInterval(() => {
+    main();
+}, 1000);
+
 const setCookie = (cname, cvalue) => {
     let expires = "expires=never" //+ d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-var getCookie = (cname) => {
+const getCookie = (cname) => {
     var name = cname + "=";
     var ca = document.cookie.split(';');
     for (var i = 0; i < ca.length; i++) {
@@ -34,29 +38,36 @@ const getDiffInMinutes = (date1, date2) => {
 const getHeader = () => {
     return {
         "Content-Type": "application/json",
-        "Authorization": "Basic " + getCookie('auth')
+        "Authorization": "Basic " + decodeURIComponent(getCookie('auth'))
     };
 }
-
-let dadosReq = {
-    method: 'GET',
-    headers: getHeader()
-}
-
 const getPainelHTML = () => {
     return ` <div id='eloSaldo' class='eloPonto'> 
-                     Saldo:  ${saldoGeral}                     
-                    <br> Saída:  ${saidaPrevista}
-                    <br> Limite:  ${saidaLimite}                     
-                  </div>`;
+             <table>
+               <tr>
+                 <td>Saldo:</td> <td>${saldoGeral}</td>
+               </tr>
+               <tr>      
+                  <td>Saída:</td><td>${saidaPrevista}</td>
+                </tr>  
+                <tr>
+                  <td>Limite:</td><td>${saidaLimite}</td>
+                </tr>                
+              </table>    
+          </div>`;
 }
 
 async function main() {
-    setupDateTime()
-
-    await getBancoHoras();
-
     if (document.querySelector(seletorPagina)) {
+        clearInterval(timer);
+        setupDateTime()
+
+        dadosReq = {
+            method: 'GET',
+            headers: getHeader()
+        };
+
+        await getBancoHoras();        
         document.querySelector(seletorPagina).innerHTML += getPainelHTML();
     }
 }
@@ -69,7 +80,7 @@ const getPeriodoAtual = async () => {
         .then(resp => resp.periodoAtual).catch(resolve => console.log(resolve));
 }
 const aplicaCargaHorariaSabado = (saldo, data) => {
-    if (saldo == null){
+    if (saldo == null) {
         return "X";
     }
     let sinal = saldo[0];
@@ -82,15 +93,16 @@ const aplicaCargaHorariaSabado = (saldo, data) => {
         let min = (diaSemana * 48);
         minutos = minutos + (horas * 60);
 
-        if (sinal = "-") {
+        if (sinal == "-") {
             minutos += min;
         } else {
             minutos -= min;
+            sinal = "";
         }
         horas = Math.trunc(minutos / 60);
         minutos = minutos % 60;
     }
-    return `${sinal}${horas}:${minutos}`;
+    return `${sinal}${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
 }
 
 const adicionaPeriodo = (periodos, entrada, saida) => {
@@ -142,8 +154,8 @@ const getHoraSaida = (dados) => {
 
     let dataLimite = dataHoraSaida.addMinutes(minutosLimiteAcimadaCarga);
     let dadosRetorno = {};
-    dadosRetorno.dataSaida = dataHoraSaida.getHours() + ":" + dataHoraSaida.getMinutes();
-    dadosRetorno.dataLimite = dataLimite.getHours() + ":" + dataLimite.getMinutes();
+    dadosRetorno.dataSaida = String(dataHoraSaida.getHours()).padStart(2, "0") + ":" + String(dataHoraSaida.getMinutes()).padStart(2, "0");
+    dadosRetorno.dataLimite = String(dataLimite.getHours()).padStart(2, "0") + ":" + String(dataLimite.getMinutes()).padStart(2, "0");
     return dadosRetorno;
 }
 
@@ -165,9 +177,9 @@ const getBancoHoras = async () => {
 const getValor = (dados, data, campo) => {
     let dataFormatada = data.getDatePonto();
     let indexColuna = dados.colunas.indexOf(dados.colunas.filter(x => x.conteudo == campo)[0]);
-    if (indexColuna > 0){
+    if (indexColuna > 0) {
         return dados.linhas.filter(x => x[0].conteudo == dataFormatada)[0][indexColuna].conteudo;
-    }else{
+    } else {
         return null;
     }
 }
@@ -206,7 +218,3 @@ const setupDateTime = () => {
         return dataFormatada;
     }
 }
-setTimeout(() => {
-    main();
-}, 1000);      
-

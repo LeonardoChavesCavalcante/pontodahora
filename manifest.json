@@ -29,6 +29,7 @@
     "content_scripts": [ {
         "js": ["main.js" ],        
         "css": ["main.css" ],
+        "run_at": "document_end",
         "matches": [ "https://*.secullum.com.br/Ponto4Web/*" ]
     } ]
 }
