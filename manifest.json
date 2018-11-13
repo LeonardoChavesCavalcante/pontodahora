@@ -3,11 +3,6 @@
     "manifest_version": 2,
     "name": "PontoDaHora",
     "version": "1.0",
-    "browser_action":{
-        "default_icon": "icon19.png",
-        "default_popup": "popup.html"
-        },
- 
     // Descrição da nossa extensão
     "description": "A ferramenta facilita a visualização do seu saldo no banco de horas, e a previsão de saída do dia.",
  
@@ -16,8 +11,13 @@
        "48": "icon48.png",
        "128": "icon128.png"
     },
- 
- 
+    // Utilizaremos as "Page Actions" e registramos isso aqui
+    "page_action": {
+        "default_icon": {
+            "19" : "icon19.png"
+        },
+        "default_title": "PontoDaHora"
+    },
     // Aqui declaramos as permissões que precisamos
     "permissions": [
         "tabs",

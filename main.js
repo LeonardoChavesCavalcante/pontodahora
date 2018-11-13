@@ -1,126 +1,34 @@
-let idFuncionario;
 
 let saidaPrevista = "0:00";
 let saidaLimite = "0:00";
 let saldoGeral = "0:00";
 
 
-const htmlLogin = `<div id="login-form-campos">
-                    <h3>Login do Ponto</h3>
-                   <p>
-                      <input name="usuario" id="userLogin" type="text" placeholder="Nº da Folha" value="" maxlength="22">
-                   </p>
-                   <p>
-                      <input name="senha" id="userSenha" type="password" placeholder="Senha" value="" maxlength="10">
-                   </p>
-                   <ul class="errorList"></ul>
-                   <p> 
-                    <button id="btnLogin">Entrar</button>
-                   </p>
-                 </div>`;
 
-const htmlSaldo = ` <div id='eloSaldo' class='eloPonto'> 
-                         Saída: ${saidaPrevista}
-                    <br> Limite:${saidaLimite} 
-                    <br> Saldo: ${saldoGeral} 
+
+let seletorPagina = "#nav-container";
+       seletorPagina ="#dados-cartao-ponto";
+
+async function main() {    
+    await getBancoHoras();
+    const htmlSaldo = ` <div id='eloSaldo' class='eloPonto'> 
+                     Saldo: ${saldoGeral}                     
+                    <br> Saída: ${saidaPrevista}
+                    <br> Limite:${saidaLimite}                     
                   </div>`;
 
-
-
-const seletorPopUp = "#popupDados";
-const seletorPagina = "#nav-container";
-
-
-const seletor = seletorPopUp;
-
-const logar = ()=>{
-    let usuario = document.querySelector("#userLogin").value;
-    let senha = document.querySelector("#userSenha").value;
     
-    autenticar(usuario,senha);
-    alert( getCookie('auth'));
-}
-
-function main() {
-    
-    let cookieAuth = getCookie('auth');
-
-
-    if ((cookieAuth && cookieAuth != '')) {
-        getDadosBancoHoras();
-
-    }
-    else {
-        if (document.querySelector(seletorPopUp)) {
-            document.querySelector(seletorPopUp).innerHTML = htmlLogin;
-        }
-    }
-
-    if (document.querySelector(seletorPopUp)) {
-
-        document.querySelector(seletorPopUp).innerHTML = htmlSaldo;
-        document.querySelector(seletorPopUp).innerHTML = htmlLogin;
-    }
     if (document.querySelector(seletorPagina)) {
-        document.querySelector(seletorPagina).innerHTML = htmlSaldo;
+        
+        document.querySelector(seletorPagina).innerHTML += htmlSaldo;
     }
+
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    main();
-    if (document.querySelector("#btnLogin")){
-      document.querySelector("#btnLogin").onclick = logar;
-    }
-
+document.addEventListener('DOMContentLoaded', function async () {
+     main();
+  
 });
-
-const getDadosBancoHoras = async () => {
-
-    let urlDadosPonto = `https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=${getPeriodoAtual()}"`
-    let dadosReq = {
-        method: 'GET',
-        headers: getHeader()
-    };
-    fetch(urlDadosPonto, dadosReq)
-
-
-
-}
-
-
-const autenticar = async (usuario, senha) => {
-
-    const dadosAutenticacao = {
-        "usuario": usuario,
-        "senha": senha,
-        "acesso": "0",
-        "continuarConectado": true,
-        "nomeEmpresa": ""
-    };
-
-    const dadosPost = {
-        method: 'POST',
-        headers: getHeader(),
-        body: JSON.stringify(dadosAutenticacao)
-    }
-
-    await fetch('https://www.secullum.com.br/Ponto4Web/api/1185328083/Login', dadosPost)
-    .then( resp => resp.json());
-    
-}
-
-const getIDFuncionario = async () => {
-
-    let urlGetIDFuncionario = "'https://www.secullum.com.br/Ponto4Web/api/1185328083/Sessao/GetIdFuncionarioSessao";
-    let dadosReq = {
-        method: 'GET',
-        headers: getHeader()
-    }
-
-    await fetch(urlGetIDFuncionario, dadosReq).then(resp => valor = resp.json)
-        .then(resp => idFuncionario = resp);
-    return idFuncionario;
-}
 
 const getPeriodoAtual = async () => {
 
@@ -128,11 +36,9 @@ const getPeriodoAtual = async () => {
         method: 'GET',
         headers: getHeader()
     }
-    let periodAtual;
+    const idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
     let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/Periodos?funcionarioId=${idFuncionario}`
-    return await fetch(urlPeriodo, dadosReq).then(resp => valor = resp.json)
-        .then(resp => res.periodAtual);
-
+    return await fetch(urlPeriodo, dadosReq).then(resp =>  resp.json()).then(resp =>  resp.periodoAtual);
 }
 
 const getBancoHoras = async () => {
@@ -140,11 +46,15 @@ const getBancoHoras = async () => {
         method: 'GET',
         headers: getHeader()
     }
-    idFuncionario = getIDFuncionario();
-    let periodAtual = await getPeriodoAtual();
-    let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=3${idPeriodoAtual}`
-    return await fetch(urlPeriodo, dadosReq).then(resp => valor = resp.json)
-        .then(resp => res.periodAtual);
+    let dados ={};
+    idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
+    let idPeriodoAtual = await getPeriodoAtual();
+    let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=${idPeriodoAtual}`    
+    await fetch(urlPeriodo, dadosReq).then(resp => resp.json()).then(resp => dados = resp);
+    saldoGeral = dados.linhas.filter( x => x[0].conteudo ==  '01/11/2018 - QUI')[0][dados.colunas.indexOf(dados.colunas.filter( x => x.conteudo =='BSaldo')[0])].conteudo;
+    
+    console.log('aqui: ',saldoGeral);
+    return saldoGeral;
 
 }
 
@@ -156,14 +66,14 @@ const getHeader = () => {
     };
 }
 
-function setCookie(cname, cvalue, exdays) {
+const setCookie = (cname, cvalue, exdays)=> {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires=never" //+ d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-function getCookie(cname) {
+const getCookie = (cname)=> {
     var name = cname + "=";
     var ca = document.cookie.split(';');
     for (var i = 0; i < ca.length; i++) {
@@ -177,3 +87,7 @@ function getCookie(cname) {
     }
     return "";
 };  
+
+setTimeout(() => {
+    main();
+}, 1000);
