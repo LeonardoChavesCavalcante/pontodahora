@@ -18,6 +18,7 @@
         },
         "default_title": "PontoDaHora"
     },
+    "author":"Leonardo Cavalcante"
     // Aqui declaramos as permissões que precisamos
     "permissions": [
         "tabs",
