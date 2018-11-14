@@ -6,9 +6,41 @@ let saidaLimite = " 0:00";
 let saldoGeral = " 0:00";
 let seletorPagina = "#dados-cartao-ponto"; // "#nav-container"
 
-const timer = setInterval(() => {
-    main();
-}, 1000);
+const setupDateTime = () => {
+    Date.prototype.addDays = function (num) {
+        var value = this.valueOf();
+        value += 86400000 * num;
+        return new Date(value);
+    }
+
+    Date.prototype.addSeconds = function (num) {
+        var value = this.valueOf();
+        value += 1000 * num;
+        return new Date(value);
+    }
+
+    Date.prototype.addMinutes = function (num) {
+        var value = this.valueOf();
+        value += 60000 * num;
+        return new Date(value);
+    }    
+
+    Date.prototype.addHours = function (num) {
+        var value = this.valueOf();
+        value += 3600000 * num;
+        return new Date(value);
+    }
+    Date.prototype.getDatePonto = function (num) {
+        const semana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+        let data = new Date(this.valueOf());
+        let dd = data.getDate();
+        let mm = data.getMonth() + 1;
+        let yyyy = data.getFullYear();
+        let dataFormatada = `${dd}/${mm}/${yyyy} - ${semana[data.getDay()]}`;
+        return dataFormatada;
+    }
+}
+
 
 const setCookie = (cname, cvalue) => {
     let expires = "expires=never" //+ d.toUTCString();
@@ -57,10 +89,10 @@ const getPainelHTML = () => {
           </div>`;
 }
 
-async function main() {
+async function main() { 
+    setupDateTime();   
     if (document.querySelector(seletorPagina)) {
-        clearInterval(timer);
-        setupDateTime()
+        clearInterval(timer);        
 
         dadosReq = {
             method: 'GET',
@@ -89,7 +121,7 @@ const aplicaCargaHorariaSabado = (saldo, data) => {
     let minutos = parseInt(arraySaldo[1]);
     let horas = Math.abs(parseInt(arraySaldo[0]));
 
-    if (diaSemana > 0 && diaSemana < 7) {
+    if (diaSemana > 0 && diaSemana < 5) {
         let min = (diaSemana * 48);
         minutos = minutos + (horas * 60);
 
@@ -119,8 +151,8 @@ const adicionaPeriodo = (periodos, entrada, saida) => {
         periodos.push(periodo);
     }
 }
-const getHoraSaida = (dados) => {
-
+const getHoraSaida =  (dados) => {    
+    
     let hoje = new Date();
     let periodosTrabalhados = [];
     let periodosIntervalos = [];
@@ -142,20 +174,35 @@ const getHoraSaida = (dados) => {
     adicionaPeriodo(periodosIntervalos, sai2, ent3);
 
 
-    let somaMinutosTrabalhado = periodosTrabalhados.reduce((valor, reg) => valor + reg.minutos, 0);
-    let somaMinutosIntervalo = periodosIntervalos.reduce((valor, reg) => valor + reg.minutos, 0);
+    let somaMinutosTrabalhado = 0;
+    if (periodosTrabalhados.length > 0) {
+        somaMinutosTrabalhado = periodosTrabalhados.reduce((valor, reg) => valor + reg.minutos, 0);
+    }   
+
+    let somaMinutosIntervalo = 0;
+    if (periodosIntervalos.length > 0){
+       somaMinutosIntervalo = periodosIntervalos.reduce((valor, reg) => valor + reg.minutos, 0);
+    }
 
     let menorEntrada;
     if (periodosTrabalhados[0]) {
         menorEntrada = new Date(periodosTrabalhados[0].entrada);
-    }
-    dataHoraSaida = menorEntrada.addMinutes(cargaHorariaMinutos);
+    }else{
+        menorEntrada = new Date();
+    }    
+    dataHoraSaida = menorEntrada.addMinutes(cargaHorariaMinutos);        
     dataHoraSaida = dataHoraSaida.addMinutes(somaMinutosIntervalo);
-
-    let dataLimite = dataHoraSaida.addMinutes(minutosLimiteAcimadaCarga);
-    let dadosRetorno = {};
+   
+    if (hoje.getDay() == 5){
+        dataHoraSaida = dataHoraSaida.addHours(-1);
+    }
+    
+    let dataLimite = dataHoraSaida.addMinutes(minutosLimiteAcimadaCarga);        
+    let dadosRetorno = {};    
+    
     dadosRetorno.dataSaida = String(dataHoraSaida.getHours()).padStart(2, "0") + ":" + String(dataHoraSaida.getMinutes()).padStart(2, "0");
     dadosRetorno.dataLimite = String(dataLimite.getHours()).padStart(2, "0") + ":" + String(dataLimite.getMinutes()).padStart(2, "0");
+    
     return dadosRetorno;
 }
 
@@ -183,38 +230,6 @@ const getValor = (dados, data, campo) => {
         return null;
     }
 }
-
-const setupDateTime = () => {
-    Date.prototype.addDays = function (num) {
-        var value = this.valueOf();
-        value += 86400000 * num;
-        return new Date(value);
-    }
-
-    Date.prototype.addSeconds = function (num) {
-        var value = this.valueOf();
-        value += 1000 * num;
-        return new Date(value);
-    }
-
-    Date.prototype.addMinutes = function (num) {
-        var value = this.valueOf();
-        value += 60000 * num;
-        return new Date(value);
-    }
-
-    Date.prototype.addHours = function (num) {
-        var value = this.valueOf();
-        value += 3600000 * num;
-        return new Date(value);
-    }
-    Date.prototype.getDatePonto = function (num) {
-        const semana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
-        let data = new Date(this.valueOf());
-        let dd = data.getDate();
-        let mm = data.getMonth() + 1;
-        let yyyy = data.getFullYear();
-        let dataFormatada = `${dd}/${mm}/${yyyy} - ${semana[data.getDay()]}`;
-        return dataFormatada;
-    }
-}
+const timer = setInterval(() => {
+    main();
+}, 2000);

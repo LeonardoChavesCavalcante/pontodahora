@@ -28,8 +28,7 @@
     // Injetaremos esses arquivos quando "match" ocorrer
     "content_scripts": [ {
         "js": ["main.js" ],        
-        "css": ["main.css" ],
-        "run_at": "document_end",
+        "css": ["main.css" ],       
         "matches": [ "https://*.secullum.com.br/Ponto4Web/*" ]
     } ]
 }
