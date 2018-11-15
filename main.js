@@ -152,6 +152,7 @@ const adicionaPeriodo = (periodos, entrada, saida) => {
     }
 }
 const getHoraSaida =  (dados) => {    
+    let dadosRetorno = {};    
     
     let hoje = new Date();
     let periodosTrabalhados = [];
@@ -165,6 +166,11 @@ const getHoraSaida =  (dados) => {
 
     let ent3 = getValor(dados, hoje, "Ent. 3");
     let sai3 = getValor(dados, hoje, "Saí. 3");
+    if (ent1.trim().toUpperCase() =="FERIADO") {
+        dadosRetorno.dataSaida = "00:00";
+        dadosRetorno.dataLimite = "00:00";
+        return dadosRetorno;
+    }
 
     adicionaPeriodo(periodosTrabalhados, ent1, sai1);
     adicionaPeriodo(periodosTrabalhados, ent2, sai2);
@@ -198,8 +204,7 @@ const getHoraSaida =  (dados) => {
     }
     
     let dataLimite = dataHoraSaida.addMinutes(minutosLimiteAcimadaCarga);        
-    let dadosRetorno = {};    
-    
+        
     dadosRetorno.dataSaida = String(dataHoraSaida.getHours()).padStart(2, "0") + ":" + String(dataHoraSaida.getMinutes()).padStart(2, "0");
     dadosRetorno.dataLimite = String(dataLimite.getHours()).padStart(2, "0") + ":" + String(dataLimite.getMinutes()).padStart(2, "0");
     
