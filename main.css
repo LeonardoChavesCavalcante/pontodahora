@@ -1,4 +1,4 @@
-.eloPonto{
+.PontoDaHora{
     background-color:rgba(145, 255, 150, 0.678) ;
     float:left;      
     color: black;    
@@ -13,6 +13,6 @@
     padding-top:5px;
     padding-left:10px;
 }
-.eloPonto:hover {
+.PontoDaHora:hover {
     box-shadow: 0 5px 5px 0 rgba(0,0,0,0.2);
 }

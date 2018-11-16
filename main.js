@@ -1,5 +1,6 @@
 let dadosReq = {};
 let cargaHorariaMinutos = 528;
+let cargaSabadoDividida = 48;
 let minutosLimiteAcimadaCarga = 72;
 let saidaPrevista = " 0:00";
 let saidaLimite = " 0:00";
@@ -8,39 +9,39 @@ let seletorPagina = "#dados-cartao-ponto"; // "#nav-container"
 
 const setupDateTime = () => {
     Date.prototype.addDays = function (num) {
-        var value = this.valueOf();
+        let value = this.valueOf();
         value += 86400000 * num;
         return new Date(value);
     }
 
     Date.prototype.addSeconds = function (num) {
-        var value = this.valueOf();
+        let value = this.valueOf();
         value += 1000 * num;
         return new Date(value);
     }
 
     Date.prototype.addMinutes = function (num) {
-        var value = this.valueOf();
+        let value = this.valueOf();
         value += 60000 * num;
         return new Date(value);
-    }    
+    }
 
     Date.prototype.addHours = function (num) {
-        var value = this.valueOf();
+        let value = this.valueOf();
         value += 3600000 * num;
         return new Date(value);
     }
+
     Date.prototype.getDatePonto = function (num) {
         const semana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
         let data = new Date(this.valueOf());
-        let dd = data.getDate();
-        let mm = data.getMonth() + 1;
+        let dd = String(data.getDate()).padStart(2, "0");
+        let mm = String(data.getMonth() + 1).padStart(2, "0");
         let yyyy = data.getFullYear();
         let dataFormatada = `${dd}/${mm}/${yyyy} - ${semana[data.getDay()]}`;
         return dataFormatada;
     }
 }
-
 
 const setCookie = (cname, cvalue) => {
     let expires = "expires=never" //+ d.toUTCString();
@@ -48,10 +49,10 @@ const setCookie = (cname, cvalue) => {
 }
 
 const getCookie = (cname) => {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
+    let name = cname + "=";
+    let ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
         while (c.charAt(0) == ' ') {
             c = c.substring(1);
         }
@@ -74,7 +75,7 @@ const getHeader = () => {
     };
 }
 const getPainelHTML = () => {
-    return ` <div id='eloSaldo' class='eloPonto'> 
+    return ` <div id='painelPontoDaHora' class='PontoDaHora'> 
              <table>
                <tr>
                  <td>Saldo:</td> <td>${saldoGeral}</td>
@@ -89,17 +90,17 @@ const getPainelHTML = () => {
           </div>`;
 }
 
-async function main() { 
-    setupDateTime();   
-    if (document.querySelector(seletorPagina)) {
-        clearInterval(timer);        
+async function main() {    
+    if (document.querySelector(seletorPagina)) {        
+        clearInterval(timer);
+        setupDateTime();        
 
         dadosReq = {
             method: 'GET',
             headers: getHeader()
         };
 
-        await getBancoHoras();        
+        await getBancoHoras();
         document.querySelector(seletorPagina).innerHTML += getPainelHTML();
     }
 }
@@ -120,20 +121,25 @@ const aplicaCargaHorariaSabado = (saldo, data) => {
     arraySaldo = saldo.split(":");
     let minutos = parseInt(arraySaldo[1]);
     let horas = Math.abs(parseInt(arraySaldo[0]));
+    let min = 0;
 
-    if (diaSemana > 0 && diaSemana < 5) {
-        let min = (diaSemana * 48);
-        minutos = minutos + (horas * 60);
-
-        if (sinal == "-") {
-            minutos += min;
-        } else {
-            minutos -= min;
-            sinal = "";
-        }
-        horas = Math.trunc(minutos / 60);
-        minutos = minutos % 60;
+    if (diaSemana <= 4) {        
+        min = (diaSemana * diaSemana);
+    } else {
+        min = 180;
     }
+
+    minutos = minutos + (horas * 60);
+
+    if (sinal == "-") {
+        minutos += min;
+    } else {
+        minutos -= min;
+        sinal = "";
+    }
+    horas = Math.trunc(minutos / 60);
+    minutos = minutos % 60;
+
     return `${sinal}${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
 }
 
@@ -151,9 +157,9 @@ const adicionaPeriodo = (periodos, entrada, saida) => {
         periodos.push(periodo);
     }
 }
-const getHoraSaida =  (dados) => {    
-    let dadosRetorno = {};    
-    
+const getHoraSaida = (dados) => {
+    let dadosRetorno = {};
+
     let hoje = new Date();
     let periodosTrabalhados = [];
     let periodosIntervalos = [];
@@ -166,7 +172,7 @@ const getHoraSaida =  (dados) => {
 
     let ent3 = getValor(dados, hoje, "Ent. 3");
     let sai3 = getValor(dados, hoje, "Saí. 3");
-    if (ent1 && (ent1 != null) && (ent1.trim().toUpperCase() =="FERIADO")) {
+    if (ent1 && (ent1 != null) && (ent1.trim().toUpperCase() == "FERIADO")) {
         dadosRetorno.dataSaida = "00:00";
         dadosRetorno.dataLimite = "00:00";
         return dadosRetorno;
@@ -183,31 +189,31 @@ const getHoraSaida =  (dados) => {
     let somaMinutosTrabalhado = 0;
     if (periodosTrabalhados.length > 0) {
         somaMinutosTrabalhado = periodosTrabalhados.reduce((valor, reg) => valor + reg.minutos, 0);
-    }   
+    }
 
     let somaMinutosIntervalo = 0;
-    if (periodosIntervalos.length > 0){
-       somaMinutosIntervalo = periodosIntervalos.reduce((valor, reg) => valor + reg.minutos, 0);
+    if (periodosIntervalos.length > 0) {
+        somaMinutosIntervalo = periodosIntervalos.reduce((valor, reg) => valor + reg.minutos, 0);
     }
 
     let menorEntrada;
     if (periodosTrabalhados[0]) {
         menorEntrada = new Date(periodosTrabalhados[0].entrada);
-    }else{
+    } else {
         menorEntrada = new Date();
-    }    
-    dataHoraSaida = menorEntrada.addMinutes(cargaHorariaMinutos);        
+    }
+    dataHoraSaida = menorEntrada.addMinutes(cargaHorariaMinutos);
     dataHoraSaida = dataHoraSaida.addMinutes(somaMinutosIntervalo);
-   
-    let dataLimite = dataHoraSaida.addMinutes(minutosLimiteAcimadaCarga);        
-    
-    if (hoje.getDay() == 5){
+
+    let dataLimite = dataHoraSaida.addMinutes(minutosLimiteAcimadaCarga);
+
+    if (hoje.getDay() == 5) {
         dataHoraSaida = dataHoraSaida.addHours(-1);
     }
-        
+
     dadosRetorno.dataSaida = String(dataHoraSaida.getHours()).padStart(2, "0") + ":" + String(dataHoraSaida.getMinutes()).padStart(2, "0");
     dadosRetorno.dataLimite = String(dataLimite.getHours()).padStart(2, "0") + ":" + String(dataLimite.getMinutes()).padStart(2, "0");
-    
+
     return dadosRetorno;
 }
 
@@ -237,4 +243,6 @@ const getValor = (dados, data, campo) => {
 }
 const timer = setInterval(() => {
     main();
-}, 2000);
+}, 1000);
+
+
