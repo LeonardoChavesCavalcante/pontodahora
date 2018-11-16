@@ -1,16 +1,15 @@
 .eloPonto{
-    background-color:lightgreen;
+    background-color:rgba(145, 255, 150, 0.678) ;
     float:left;      
-    color: black;
-    margin-bottom: 10px;
-    font-style:bold;
-    font-weight:bold;
-    font-family: "Segoe UI","Arial","Times New Roman";
-    font-size: 17px;
+    color: black;    
+    margin-bottom: 10px;  
+    font-weight: bold;
+    font-family: "Arial","Times New Roman";
+    font-size: 15px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;     
-    width: 130px;   
-    height: 80px;
+    width: 115px;   
+    height: 68px;
     padding-top:5px;
     padding-left:10px;
 }

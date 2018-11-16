@@ -166,7 +166,7 @@ const getHoraSaida =  (dados) => {
 
     let ent3 = getValor(dados, hoje, "Ent. 3");
     let sai3 = getValor(dados, hoje, "Saí. 3");
-    if (ent1.trim().toUpperCase() =="FERIADO") {
+    if (ent1 && (ent1 != null) && (ent1.trim().toUpperCase() =="FERIADO")) {
         dadosRetorno.dataSaida = "00:00";
         dadosRetorno.dataLimite = "00:00";
         return dadosRetorno;
@@ -199,11 +199,11 @@ const getHoraSaida =  (dados) => {
     dataHoraSaida = menorEntrada.addMinutes(cargaHorariaMinutos);        
     dataHoraSaida = dataHoraSaida.addMinutes(somaMinutosIntervalo);
    
+    let dataLimite = dataHoraSaida.addMinutes(minutosLimiteAcimadaCarga);        
+    
     if (hoje.getDay() == 5){
         dataHoraSaida = dataHoraSaida.addHours(-1);
     }
-    
-    let dataLimite = dataHoraSaida.addMinutes(minutosLimiteAcimadaCarga);        
         
     dadosRetorno.dataSaida = String(dataHoraSaida.getHours()).padStart(2, "0") + ":" + String(dataHoraSaida.getMinutes()).padStart(2, "0");
     dadosRetorno.dataLimite = String(dataLimite.getHours()).padStart(2, "0") + ":" + String(dataLimite.getMinutes()).padStart(2, "0");
