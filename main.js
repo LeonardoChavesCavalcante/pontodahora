@@ -124,7 +124,7 @@ const aplicaCargaHorariaSabado = (saldo, data) => {
     let min = 0;
 
     if (diaSemana <= 4) {        
-        min = (diaSemana * diaSemana);
+        min = (diaSemana * cargaSabadoDividida);
     } else {
         min = 180;
     }
