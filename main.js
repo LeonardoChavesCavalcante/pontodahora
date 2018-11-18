@@ -1,5 +1,6 @@
 let dadosReq = {};
 let cargaHorariaMinutos = 528;
+let cargaHorariaSabadoMinutos = 360;
 let cargaSabadoDividida = 48;
 let minutosLimiteAcimadaCarga = 72;
 let saidaPrevista = " 0:00";
@@ -100,71 +101,72 @@ async function main() {
             headers: getHeader()
         };
 
-        await getBancoHoras();
-        document.querySelector(seletorPagina).innerHTML += getPainelHTML();
-    }
-}
-
-const getPeriodoAtual = async () => {
-
-    const idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
-    let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/Periodos?funcionarioId=${idFuncionario}`
-    return await fetch(urlPeriodo, dadosReq).then(resp => resp.json())
-        .then(resp => resp.periodoAtual).catch(resolve => console.log(resolve));
-}
-const aplicaCargaHorariaSabado = (saldo, data) => {
-    if (saldo == null) {
-        return "X";
-    }
-    let sinal = saldo[0];
-    let diaSemana = data.getDay();
-    arraySaldo = saldo.split(":");
-    let minutos = parseInt(arraySaldo[1]);
-    let horas = Math.abs(parseInt(arraySaldo[0]));
-    let min = 0;
-
-    if (diaSemana <= 4) {        
-        min = (diaSemana * cargaSabadoDividida);
-    } else {
-        min = 180;
-    }
-
-    minutos = minutos + (horas * 60);
-
-    if (sinal == "-") {
-        minutos += min;
-    } else {
-        minutos -= min;
-        sinal = "";
-    }
-    horas = Math.trunc(minutos / 60);
-    minutos = minutos % 60;
-
-    return `${sinal}${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
-}
-
-const adicionaPeriodo = (periodos, entrada, saida) => {
-
-    let hoje = new Date();
-    if (entrada != null) {
-        let periodo = {};
-        if (saida == null) {
-            saida = hoje.getHours() + ":" + hoje.getMinutes();
+            await getBancoHoras();
+            document.querySelector(seletorPagina).innerHTML += getPainelHTML();
         }
-        periodo.entrada = new Date("01/01/2000 " + entrada);
-        periodo.saida = new Date("01/01/2000 " + saida);
-        periodo.minutos = getDiffInMinutes(periodo.entrada, periodo.saida);
-        periodos.push(periodo);
     }
-}
-const getHoraSaida = (dados) => {
-    let dadosRetorno = {};
 
-    let hoje = new Date();
-    let periodosTrabalhados = [];
-    let periodosIntervalos = [];
+    const getPeriodoAtual = async () => {
 
-    let ent1 = getValor(dados, hoje, "Ent. 1");
+        const idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
+        let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/Periodos?funcionarioId=${idFuncionario}`
+        return await fetch(urlPeriodo, dadosReq).then(resp => resp.json())
+            .then(resp => resp.periodoAtual).catch(resolve => console.log(resolve));
+    }
+    const aplicaCargaHorariaSabado = (saldo, data) => {
+        if (saldo == null) {
+            return "X";
+        }
+        let sinal = saldo[0];
+        let diaSemana = data.getDay();
+        arraySaldo = saldo.split(":");
+        let minutos = parseInt(arraySaldo[1]);
+        let horas = Math.abs(parseInt(arraySaldo[0]));
+        let min = 0;
+
+        
+        if (diaSemana <= 4) {        
+            min = (diaSemana * cargaSabadoDividida);
+        } else if(diaSemana != 6){
+            min = 180;
+        }
+
+        minutos = minutos + (horas * 60);
+
+        if (sinal == "-") {
+            minutos += min;
+        } else {
+            minutos -= min;
+            sinal = "";
+        }
+        horas = Math.trunc(minutos / 60);
+        minutos = minutos % 60;
+
+        return `${sinal}${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
+    }
+
+    const adicionaPeriodo = (periodos, entrada, saida) => {
+
+        let hoje = new Date();
+        if (entrada != null) {
+            let periodo = {};
+            if (saida == null) {
+                saida = hoje.getHours() + ":" + hoje.getMinutes();
+            }
+            periodo.entrada = new Date("01/01/2000 " + entrada);
+            periodo.saida = new Date("01/01/2000 " + saida);
+            periodo.minutos = getDiffInMinutes(periodo.entrada, periodo.saida);
+            periodos.push(periodo);
+        }
+    }
+    const getHoraSaida = (dados) => {
+        let dadosRetorno = {};
+
+        let hoje = new Date();
+        let periodosTrabalhados = [];
+        let periodosIntervalos = [];
+
+        let ent1 = getValor(dados, hoje, "Ent. 1");
     let sai1 = getValor(dados, hoje, "Saí. 1");
 
     let ent2 = getValor(dados, hoje, "Ent. 2");
@@ -202,6 +204,10 @@ const getHoraSaida = (dados) => {
     } else {
         menorEntrada = new Date();
     }
+    if (hoje.getDay() == 6){
+        cargaHorariaMinutos = cargaHorariaSabadoMinutos;
+    }
+
     dataHoraSaida = menorEntrada.addMinutes(cargaHorariaMinutos);
     dataHoraSaida = dataHoraSaida.addMinutes(somaMinutosIntervalo);
 
