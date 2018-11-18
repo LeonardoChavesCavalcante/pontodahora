@@ -250,5 +250,3 @@ const getValor = (dados, data, campo) => {
 const timer = setInterval(() => {
     main();
 }, 1000);
-
-
