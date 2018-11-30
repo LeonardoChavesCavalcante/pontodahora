@@ -127,21 +127,31 @@ async function main() {
         
         if (diaSemana <= 4) {        
             min = (diaSemana * cargaSabadoDividida);
-        } else if(diaSemana != 6){
+        }
+        if(diaSemana == 5){
             min = 180;
         }
 
         minutos = minutos + (horas * 60);
-
         if (sinal == "-") {
-            minutos += min;
-        } else {
-            minutos -= min;
-            sinal = "";
+            minutos = minutos * -1
         }
-        horas = Math.trunc(minutos / 60);
-        minutos = minutos % 60;
+     
+        minutos-=min;
+        console.log('minutos',minutos);
+        console.log('MIN',min);
+        console.log('DIA',diaSemana);
 
+        
+        horas = Math.trunc(minutos / 60);
+        minutos = Math.abs(minutos % 60);
+        
+        sinal = "";
+        if (minutos < 0){
+            sinal = "-";
+        }
+        minutos = Math.abs(minutos);
+        horas = Math.abs(horas);
         return `${sinal}${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
     }
 
