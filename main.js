@@ -72,7 +72,8 @@ const getDiffInMinutes = (date1, date2) => {
 const getHeader = () => {
     return {
         "Content-Type": "application/json",
-        "Authorization": "Basic " + decodeURIComponent(getCookie('auth'))
+        "Authorization": "Basic " + decodeURIComponent(getCookie('auth')),
+        "Accept-Language":"pt-BR"
     };
 }
 const getPainelHTML = () => {
