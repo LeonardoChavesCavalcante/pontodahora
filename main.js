@@ -111,7 +111,7 @@ async function main() {
     const getPeriodoAtual = async () => {
 
         const idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
-        let urlPeriodo = `https://www.secullum.com.br/Ponto4Web/api/1185328083/Periodos?funcionarioId=${idFuncionario}`
+        let urlPeriodo = `https://www.secullum.com.br/Ponto4Web-0/api/1185328083/Periodos?funcionarioId=${idFuncionario}`
         return await fetch(urlPeriodo, dadosReq).then(resp => resp.json())
             .then(resp => resp.periodoAtual).catch(resolve => console.log(resolve));
     }
@@ -119,6 +119,7 @@ async function main() {
         if (saldo == null) {
             return "X";
         }
+        
         let sinal = saldo[0];
         let diaSemana = data.getDay();
         arraySaldo = saldo.split(":");
@@ -139,16 +140,17 @@ async function main() {
             minutos = minutos * -1
         }
      
-        minutos-=min;
+        minutos-= min;
  
-        
-        horas = Math.trunc(minutos / 60);
-        minutos = Math.abs(minutos % 60);
-        
         sinal = "";
         if (minutos < 0){
             sinal = "-";
         }
+
+        horas = Math.trunc(minutos / 60);
+        minutos = Math.abs(minutos % 60);
+        
+        
         minutos = Math.abs(minutos);
         horas = Math.abs(horas);
         return `${sinal}${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
@@ -237,7 +239,7 @@ const getBancoHoras = async () => {
     let dados = {};
     idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
     let idPeriodoAtual =  await getPeriodoAtual();    
-    let urlBancoHoras = `https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=${idPeriodoAtual}`
+    let urlBancoHoras = `https://www.secullum.com.br/Ponto4Web-0/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=${idPeriodoAtual}`
     await fetch(urlBancoHoras, dadosReq).then(resp => resp.json()).then(resp => dados = resp).catch(resolve => console.log(resolve));;
     
 
