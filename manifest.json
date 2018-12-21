@@ -10,14 +10,7 @@
     "icons": {
        "48": "icon48.png",
        "128": "icon128.png"
-    },
-    // Utilizaremos as "Page Actions" e registramos isso aqui
-    "page_action": {
-        "default_icon": {
-            "19" : "icon19.png"
-        },
-        "default_title": "PontoDaHora"
-    },
+    }, 
     "author":"Leonardo Cavalcante",
     // Aqui declaramos as permissões que precisamos
     "permissions": [
@@ -30,6 +23,6 @@
     "content_scripts": [ {
         "js": ["main.js" ],        
         "css": ["main.css" ],       
-        "matches": [ "https://*.secullum.com.br/Ponto4Web/*" ]
+        "matches": [ "https://*.secullum.com.br/Ponto4Web*" ]
     } ]
 }

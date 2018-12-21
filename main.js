@@ -104,6 +104,7 @@ async function main() {
 
             await getBancoHoras();
             document.querySelector(seletorPagina).innerHTML += getPainelHTML();
+            document.getElementById("periodos").value = 5;
         }
     }
 
@@ -139,10 +140,7 @@ async function main() {
         }
      
         minutos-=min;
-        console.log('minutos',minutos);
-        console.log('MIN',min);
-        console.log('DIA',diaSemana);
-
+ 
         
         horas = Math.trunc(minutos / 60);
         minutos = Math.abs(minutos % 60);
@@ -217,6 +215,7 @@ async function main() {
     }
     if (hoje.getDay() == 6){
         cargaHorariaMinutos = cargaHorariaSabadoMinutos;
+        minutosLimiteAcimadaCarga =0;
     }
 
     dataHoraSaida = menorEntrada.addMinutes(cargaHorariaMinutos);
@@ -237,9 +236,10 @@ async function main() {
 const getBancoHoras = async () => {
     let dados = {};
     idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
-    let idPeriodoAtual = await getPeriodoAtual();
+    let idPeriodoAtual =  await getPeriodoAtual();    
     let urlBancoHoras = `https://www.secullum.com.br/Ponto4Web/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=${idPeriodoAtual}`
     await fetch(urlBancoHoras, dadosReq).then(resp => resp.json()).then(resp => dados = resp).catch(resolve => console.log(resolve));;
+    
 
     let hoje = new Date();
     saldoGeral = getValor(dados, hoje.addDays(-1), "BSaldo");
