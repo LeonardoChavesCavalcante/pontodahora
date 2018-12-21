@@ -103,8 +103,7 @@ async function main() {
         };
 
             await getBancoHoras();
-            document.querySelector(seletorPagina).innerHTML += getPainelHTML();
-            document.getElementById("periodos").value = 5;
+            document.querySelector(seletorPagina).innerHTML += getPainelHTML();            
         }
     }
 
