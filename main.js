@@ -7,7 +7,7 @@ let minutosLimiteAcimadaCarga = 72;
 let saidaPrevista = " 0:00";
 let saidaLimite = " 0:00";
 let saldoGeral = " 0:00";
-let seletorPagina = "#nav"; //".panel-header" //"#dados-cartao-ponto"; // "#nav-container"
+let seletorPagina = "#nav"; 
 
 
 
@@ -239,6 +239,17 @@ async function main() {
     return dadosRetorno;
 }
 
+const semanaFechamentoBancoSemSabado = () => {
+    let hoje = new Date();
+    
+    //Verifica se esta nos meses de fechamento Janeiro, Julho
+    if ((hoje.getMonth() == 0) ||  (hoje.getMonth() == 6)  ){
+        let fator = 31 - hoje.getDate() - hoje.getDay();
+        return (fator < 6);        
+    }    
+    return false;
+}
+
 const getBancoHoras = async () => {
     let dados = {};
     idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
@@ -249,7 +260,11 @@ const getBancoHoras = async () => {
 
     let hoje = new Date();
     saldoGeral = getValor(dados, hoje.addDays(-1), "BSaldo");
-    saldoGeral = aplicaCargaHorariaSabado(saldoGeral, hoje.addDays(-1));
+
+    if (!semanaFechamentoBancoSemSabado() ){
+        saldoGeral = aplicaCargaHorariaSabado(saldoGeral, hoje.addDays(-1));
+    }
+
     let dadosSaida = getHoraSaida(dados);
     saidaPrevista = dadosSaida.dataSaida;
     saidaLimite = dadosSaida.dataLimite;
