@@ -2,8 +2,7 @@
     // Obrigatório
     "manifest_version": 2,
     "name": "PontoDaHora",
-    "version": "1.0",
-    // Descrição da nossa extensão
+    "version": "1.0",    
     "description": "A ferramenta facilita a visualização do seu saldo no banco de horas e a previsão de saída no dia. É necessário selecionar todas as colunas de entradas e saídas e a coluna BSaldo.",
  
     // Íconea da nossa extensão
@@ -12,6 +11,7 @@
        "128": "icon128.png"
     }, 
     "author":"Leonardo Cavalcante",
+
     // Aqui declaramos as permissões que precisamos
     "permissions": [
         "tabs",

@@ -1,4 +1,5 @@
 let dadosReq = {};
+let carregando = false;
 let cargaHorariaMinutos = 528;
 let cargaHorariaSabadoMinutos = 360;
 let cargaSabadoDividida = 48;
@@ -6,7 +7,9 @@ let minutosLimiteAcimadaCarga = 72;
 let saidaPrevista = " 0:00";
 let saidaLimite = " 0:00";
 let saldoGeral = " 0:00";
-let seletorPagina = "#dados-cartao-ponto"; // "#nav-container"
+let seletorPagina = "#nav"; //".panel-header" //"#dados-cartao-ponto"; // "#nav-container"
+
+
 
 const setupDateTime = () => {
     Date.prototype.addDays = function (num) {
@@ -78,23 +81,24 @@ const getHeader = () => {
 }
 const getPainelHTML = () => {
     return ` <div id='painelPontoDaHora' class='PontoDaHora'> 
-             <table>
-               <tr>
-                 <td>Saldo:</td> <td>${saldoGeral}</td>
-               </tr>
+             <table>               
                <tr>      
-                  <td>Saída:</td><td>${saidaPrevista}</td>
+                  <td>Saída:</td><td>${saidaPrevista}</td>                  
                 </tr>  
                 <tr>
                   <td>Limite:</td><td>${saidaLimite}</td>
-                </tr>                
+                </tr> 
+                <tr>
+                  <td>Saldo:</td> <td>${saldoGeral}</td>
+                </tr>                 
               </table>    
           </div>`;
 }
 
 async function main() {    
-    if (document.querySelector(seletorPagina)) {        
-        clearInterval(timer);
+    if (document.querySelector(seletorPagina) && (document.querySelector("#painelPontoDaHora") == null) && !carregando ) {        
+        carregando = true;
+        //clearInterval(timer);
         setupDateTime();        
 
         dadosReq = {
@@ -102,8 +106,9 @@ async function main() {
             headers: getHeader()
         };
 
-            await getBancoHoras();
-            document.querySelector(seletorPagina).innerHTML += getPainelHTML();            
+            await getBancoHoras();     
+            document.querySelector(seletorPagina).innerHTML += getPainelHTML();    
+            carregando = false;        
         }
     }
 
