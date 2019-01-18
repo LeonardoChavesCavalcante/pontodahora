@@ -123,7 +123,6 @@ async function main() {
         if (saldo == null) {
             return "X";
         }
-        
         let sinal = saldo[0];
         let diaSemana = data.getDay();
         arraySaldo = saldo.split(":");
@@ -135,7 +134,7 @@ async function main() {
         if (diaSemana <= 4) {        
             min = (diaSemana * cargaSabadoDividida);
         }
-        if(diaSemana == 5){
+        if ((diaSemana == 5) ||  (diaSemana == 4) )   {
             min = 180;
         }
 
