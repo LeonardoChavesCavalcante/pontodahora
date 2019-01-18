@@ -129,12 +129,11 @@ async function main() {
         let minutos = parseInt(arraySaldo[1]);
         let horas = Math.abs(parseInt(arraySaldo[0]));
         let min = 0;
-
         
         if (diaSemana <= 4) {        
             min = (diaSemana * cargaSabadoDividida);
         }
-        if ((diaSemana == 5) ||  (diaSemana == 4) )   {
+        if ((diaSemana == 5) )   {
             min = 180;
         }
 
