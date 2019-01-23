@@ -242,7 +242,7 @@ const semanaFechamentoBancoSemSabado = () => {
     
     //Verifica se esta nos meses de fechamento Janeiro, Julho
     if ((hoje.getMonth() == 0) ||  (hoje.getMonth() == 6)  ){
-        let fator = 31 - hoje.getDate() - hoje.getDay();
+        let fator = 31 - hoje.getDate() + hoje.getDay();
         return (fator < 6);        
     }    
     return false;
