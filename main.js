@@ -7,7 +7,7 @@ let minutosLimiteAcimadaCarga = 72;
 let saidaPrevista = " 0:00";
 let saidaLimite = " 0:00";
 let saldoGeral = " 0:00";
-let seletorPagina = "#nav"; 
+let seletorPagina = "#nav";
 
 
 
@@ -76,7 +76,7 @@ const getHeader = () => {
     return {
         "Content-Type": "application/json",
         "Authorization": "Basic " + decodeURIComponent(getCookie('auth')),
-        "Accept-Language":"pt-BR"
+        "Accept-Language": "pt-BR"
     };
 }
 const getPainelHTML = () => {
@@ -95,91 +95,100 @@ const getPainelHTML = () => {
           </div>`;
 }
 
-async function main() {    
-    if (document.querySelector(seletorPagina) && (document.querySelector("#painelPontoDaHora") == null) && !carregando ) {        
+async function main() {
+
+    if (document.querySelector(seletorPagina) && (document.querySelector("#painelPontoDaHora") == null) && !carregando) {
         carregando = true;
         //clearInterval(timer);
-        setupDateTime();        
+        setupDateTime();
 
         dadosReq = {
             method: 'GET',
             headers: getHeader()
         };
-
-            await getBancoHoras();     
-            document.querySelector(seletorPagina).innerHTML += getPainelHTML();    
-            carregando = false;        
+        if (document.getElementById("btn-atualizar")) {
+            document.getElementById("btn-atualizar").addEventListener("click", async function () {
+                await getBancoHoras();
+                document.querySelector('#pontoDaHora').innerHTML = getPainelHTML();
+            });
         }
+
+        await getBancoHoras();
+        document.querySelector(seletorPagina).innerHTML += `<div id='pontoDaHora'>  ${getPainelHTML()} </div> `;
+        carregando = false;
+    }
+}
+
+
+
+const getPeriodoAtual = async () => {
+
+    const idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
+    let urlPeriodo = `https://www.secullum.com.br/Ponto4Web-0/api/1185328083/Periodos?funcionarioId=${idFuncionario}`
+    return await fetch(urlPeriodo, dadosReq).then(resp => resp.json())
+        .then(resp => resp.periodoAtual).catch(resolve => console.log(resolve));
+}
+const aplicaCargaHorariaSabado = (saldo, data) => {
+    if (saldo == null) {
+        return "X";
+    }
+    let sinal = saldo[0];
+    let diaSemana = data.getDay();
+    arraySaldo = saldo.split(":");
+    let minutos = parseInt(arraySaldo[1]);
+    let horas = Math.abs(parseInt(arraySaldo[0]));
+    let min = 0;
+
+    if (diaSemana <= 4) {
+        min = (diaSemana * cargaSabadoDividida);
+    }
+    if ((diaSemana == 5)) {
+        min = 180;
     }
 
-    const getPeriodoAtual = async () => {
-
-        const idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
-        let urlPeriodo = `https://www.secullum.com.br/Ponto4Web-0/api/1185328083/Periodos?funcionarioId=${idFuncionario}`
-        return await fetch(urlPeriodo, dadosReq).then(resp => resp.json())
-            .then(resp => resp.periodoAtual).catch(resolve => console.log(resolve));
-    }
-    const aplicaCargaHorariaSabado = (saldo, data) => {
-        if (saldo == null) {
-            return "X";
-        }
-        let sinal = saldo[0];
-        let diaSemana = data.getDay();
-        arraySaldo = saldo.split(":");
-        let minutos = parseInt(arraySaldo[1]);
-        let horas = Math.abs(parseInt(arraySaldo[0]));
-        let min = 0;
-        
-        if (diaSemana <= 4) {        
-            min = (diaSemana * cargaSabadoDividida);
-        }
-        if ((diaSemana == 5) )   {
-            min = 180;
-        }
-
-        minutos = minutos + (horas * 60);
-        if (sinal == "-") {
-            minutos = minutos * -1
-        }
-     
-        minutos-= min;
- 
-        sinal = "";
-        if (minutos < 0){
-            sinal = "-";
-        }
-
-        horas = Math.trunc(minutos / 60);
-        minutos = Math.abs(minutos % 60);
-        
-        
-        minutos = Math.abs(minutos);
-        horas = Math.abs(horas);
-        return `${sinal}${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
+    minutos = minutos + (horas * 60);
+    if (sinal == "-") {
+        minutos = minutos * -1
     }
 
-    const adicionaPeriodo = (periodos, entrada, saida) => {
+    minutos -= min;
 
-        let hoje = new Date();
-        if (entrada != null) {
-            let periodo = {};
-            if (saida == null) {
-                saida = hoje.getHours() + ":" + hoje.getMinutes();
-            }
-            periodo.entrada = new Date("01/01/2000 " + entrada);
-            periodo.saida = new Date("01/01/2000 " + saida);
-            periodo.minutos = getDiffInMinutes(periodo.entrada, periodo.saida);
-            periodos.push(periodo);
-        }
+    sinal = "";
+    if (minutos < 0) {
+        sinal = "-";
     }
-    const getHoraSaida = (dados) => {
-        let dadosRetorno = {};
 
-        let hoje = new Date();
-        let periodosTrabalhados = [];
-        let periodosIntervalos = [];
+    horas = Math.trunc(minutos / 60);
+    minutos = Math.abs(minutos % 60);
 
-        let ent1 = getValor(dados, hoje, "Ent. 1");
+
+    minutos = Math.abs(minutos);
+    horas = Math.abs(horas);
+    return `${sinal}${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
+}
+
+const adicionaPeriodo = (periodos, entrada, saida) => {
+
+    let hoje = new Date();
+    if (entrada != null) {
+        let periodo = {};
+        if (saida == null) {
+            saida = hoje.getHours() + ":" + hoje.getMinutes();
+        }
+        periodo.entrada = new Date("01/01/2000 " + entrada);
+        periodo.saida = new Date("01/01/2000 " + saida);
+        periodo.minutos = getDiffInMinutes(periodo.entrada, periodo.saida);
+        periodos.push(periodo);
+    }
+}
+const getHoraSaida = (dados) => {
+    let dadosRetorno = {};
+
+    let hoje = new Date();
+    let periodosTrabalhados = [];
+    let periodosIntervalos = [];
+
+    let ent1 = getValor(dados, hoje, "Ent. 1");
     let sai1 = getValor(dados, hoje, "Saí. 1");
 
     let ent2 = getValor(dados, hoje, "Ent. 2");
@@ -217,9 +226,9 @@ async function main() {
     } else {
         menorEntrada = new Date();
     }
-    if (hoje.getDay() == 6){
+    if (hoje.getDay() == 6) {
         cargaHorariaMinutos = cargaHorariaSabadoMinutos;
-        minutosLimiteAcimadaCarga =0;
+        minutosLimiteAcimadaCarga = 0;
     }
 
     dataHoraSaida = menorEntrada.addMinutes(cargaHorariaMinutos);
@@ -239,27 +248,27 @@ async function main() {
 
 const semanaFechamentoBancoSemSabado = () => {
     let hoje = new Date();
-    
+
     //Verifica se esta nos meses de fechamento Janeiro, Julho
-    if ((hoje.getMonth() == 0) ||  (hoje.getMonth() == 6)  ){
+    if ((hoje.getMonth() == 0) || (hoje.getMonth() == 6)) {
         let fator = 31 - hoje.getDate() + hoje.getDay();
-        return (fator < 6);        
-    }    
+        return (fator < 6);
+    }
     return false;
 }
 
 const getBancoHoras = async () => {
     let dados = {};
     idFuncionario = getCookie("ultimo-funcionario-id-estrutura");
-    let idPeriodoAtual =  await getPeriodoAtual();    
+    let idPeriodoAtual = await getPeriodoAtual();
     let urlBancoHoras = `https://www.secullum.com.br/Ponto4Web-0/api/1185328083/CartaoPonto?funcionarioId=${idFuncionario}&periodoId=${idPeriodoAtual}`
     await fetch(urlBancoHoras, dadosReq).then(resp => resp.json()).then(resp => dados = resp).catch(resolve => console.log(resolve));;
-    
+
 
     let hoje = new Date();
     saldoGeral = getValor(dados, hoje.addDays(-1), "BSaldo");
 
-    if (!semanaFechamentoBancoSemSabado() ){
+    if (!semanaFechamentoBancoSemSabado()) {
         saldoGeral = aplicaCargaHorariaSabado(saldoGeral, hoje.addDays(-1));
     }
 
