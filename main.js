@@ -270,6 +270,9 @@ const getBancoHoras = async () => {
 
     if (!semanaFechamentoBancoSemSabado()) {
         saldoGeral = aplicaCargaHorariaSabado(saldoGeral, hoje.addDays(-1));
+    }else{
+        cargaHorariaMinutos = 480;
+        minutosLimiteAcimadaCarga = 120;
     }
 
     let dadosSaida = getHoraSaida(dados);
