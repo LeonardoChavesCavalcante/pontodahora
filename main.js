@@ -12,6 +12,7 @@ let seletorPagina = "#nav";
 
 
 const setupDateTime = () => {
+
     Date.prototype.addDays = function (num) {
         let value = this.valueOf();
         value += 86400000 * num;
